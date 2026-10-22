@@ -16,12 +16,17 @@ import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { companiesSearchParams } from "./companies-search-params";
 import { CompaniesTable } from "./companies-table";
 import { CreateCompanySheet } from "./create-company-sheet";
+import {
+	ImportCompaniesLink,
+	ImportCompaniesLinkFallback,
+} from "./import-companies-link";
 
 export const metadata: Metadata = {
 	title: "Companies",
 };
 
 export default function CompaniesPage({
+	params,
 	searchParams,
 }: PageProps<"/[slug]/companies">) {
 	return (
@@ -34,6 +39,9 @@ export default function CompaniesPage({
 					</PageShellDescription>
 				</PageShellHeading>
 				<PageShellActions>
+					<Suspense fallback={<ImportCompaniesLinkFallback />}>
+						<ImportCompaniesLink params={params} />
+					</Suspense>
 					<CreateCompanySheet />
 				</PageShellActions>
 			</PageShellHeader>
