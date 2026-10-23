@@ -26,18 +26,6 @@ function unauthorized(): Response {
 	});
 }
 
-function submitLogin(): Response {
-	return new Response(
-		'<form method="post"></form><script>document.forms[0].submit()</script>',
-		{
-			headers: {
-				"cache-control": "no-store",
-				"content-type": "text/html; charset=utf-8",
-			},
-		},
-	);
-}
-
 export function parseBasicCredentials(
 	authorization: string | null,
 ): BasicCredentials | undefined {
@@ -86,8 +74,6 @@ export function stagingLoginPlugins({
 						if (!credentials || !secretsMatch(credentials.password, secret)) {
 							return unauthorized();
 						}
-						if (ctx.request?.method === "GET") return submitLogin();
-
 						const existing = await ctx.context.internalAdapter.findUserByEmail(
 							credentials.email,
 						);
