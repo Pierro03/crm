@@ -107,6 +107,12 @@ Staging uses dedicated Neon, Upstash Redis, and Blob resources. Each schema
 therefore moves with the code that needs it, and each environment applies a
 migration once.
 
+Google OAuth requires the exact API callback in its client configuration. When
+the Google Cloud project is unavailable, set `STAGING_LOGIN_SECRET` only on the
+API's custom `staging` environment. Open `/api/auth/staging-login` on the staging
+app. Enter an address from `ALLOWED_SIGN_IN` and the staging secret. The endpoint
+does not exist in production.
+
 Other preview deploys share the production database. They never apply migrations.
 A feature preview that adds a migration runs against a database without those
 tables. Test schema changes locally, where `bun run dev` migrates for you. Before

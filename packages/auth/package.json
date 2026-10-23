@@ -17,6 +17,10 @@
 		"./scopes": "./src/scopes.ts",
 		"./secret-box": "./src/secret-box.ts",
 		"./signed-in": "./src/signed-in.ts",
+		"./staging-login": {
+			"crm-staging": "./src/staging-login.ts",
+			"default": "./src/staging-login-disabled.ts"
+		},
 		"./slack-scopes": "./src/slack-scopes.ts",
 		"./sso": "./src/sso.ts",
 		"./workspace": "./src/workspace.ts"
