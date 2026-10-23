@@ -113,6 +113,11 @@ API's custom `staging` environment. Open `/api/auth/staging-login` on the stagin
 app. Enter an address from `ALLOWED_SIGN_IN` and the staging secret. The endpoint
 does not exist in production.
 
+The staging app and API use separate Vercel protection boundaries. Enable
+Protection Bypass for Automation on the API project. Set its generated secret as
+`API_PROTECTION_BYPASS_SECRET` only on the app's custom `staging` environment.
+The app adds the bypass header to server-side API requests.
+
 Other preview deploys share the production database. They never apply migrations.
 A feature preview that adds a migration runs against a database without those
 tables. Test schema changes locally, where `bun run dev` migrates for you. Before
