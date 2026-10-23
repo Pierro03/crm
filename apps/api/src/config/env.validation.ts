@@ -91,11 +91,6 @@ export class EnvironmentVariables {
 
 	@IsOptional()
 	@IsString()
-	@MinLength(32)
-	STAGING_LOGIN_SECRET?: string;
-
-	@IsOptional()
-	@IsString()
 	REDIS_URL?: string;
 
 	@IsOptional()

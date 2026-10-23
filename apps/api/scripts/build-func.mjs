@@ -17,8 +17,6 @@ const repoRoot = dirname(dirname(apiDir));
 const outDir = join(repoRoot, ".vercel/output");
 const funcDir = join(outDir, "functions/api/index.func");
 const bun = process.env.BUN_BIN || "bun";
-const deploymentEnvironment =
-	process.env.VERCEL_TARGET_ENV || process.env.VERCEL_ENV;
 
 const EXTERNALS = [
 	"@nestjs/microservices",
@@ -52,9 +50,6 @@ execSync(
 		"--target=node",
 		"--format=esm",
 		`--outfile=${JSON.stringify(join(funcDir, "index.mjs"))}`,
-		...(deploymentEnvironment === "staging"
-			? ["--conditions=crm-staging"]
-			: []),
 		...EXTERNALS.map((e) => `--external ${e}`),
 	].join(" "),
 	{
@@ -188,6 +183,8 @@ writeFileSync(
 
 console.log(`✓ built ${outDir}`);
 
+const deploymentEnvironment =
+	process.env.VERCEL_TARGET_ENV || process.env.VERCEL_ENV;
 const appliesMigrations = ["production", "staging"].includes(
 	deploymentEnvironment,
 );

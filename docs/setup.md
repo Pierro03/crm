@@ -107,12 +107,6 @@ Staging uses dedicated Neon, Upstash Redis, and Blob resources. Each schema
 therefore moves with the code that needs it, and each environment applies a
 migration once.
 
-Google OAuth requires the exact API callback in its client configuration. When
-the Google Cloud project is unavailable, set `STAGING_LOGIN_SECRET` only on the
-API's custom `staging` environment. Open `/api/auth/staging-login` on the staging
-app. Enter an address from `ALLOWED_SIGN_IN` and the staging secret. The endpoint
-does not exist in production.
-
 The staging app and API use separate Vercel protection boundaries. Enable
 Protection Bypass for Automation on the API project. Set its generated secret as
 `API_PROTECTION_BYPASS_SECRET` only on the app's custom `staging` environment.

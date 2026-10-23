@@ -1,6 +1,5 @@
 import { apiKey } from "@better-auth/api-key";
 import { sso } from "@better-auth/sso";
-import { stagingLoginPlugins } from "@crm/auth/staging-login";
 import { db } from "@crm/db";
 import { schemas } from "@crm/validation";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
@@ -124,10 +123,6 @@ export const auth = betterAuth({
 	},
 
 	plugins: [
-		...stagingLoginPlugins({
-			appUrl: env.appUrl,
-			secret: env.stagingLoginSecret,
-		}),
 		...(slackOAuth
 			? [
 					genericOAuth({

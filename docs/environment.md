@@ -79,10 +79,6 @@ list fails closed.** Parsed on demand. `packages/auth/src/workspace.ts`.
 - **`API_PROTECTION_BYPASS_SECRET`** lets the custom staging app call its protected
   API. Set it only on the app project. Every server-side API request adds Vercel's
   protection bypass header. The browser never receives this value.
-- **`STAGING_LOGIN_SECRET`** enables `/api/auth/staging-login` in the custom staging
-  build. The browser requests an allowed email address and this secret through HTTP
-  Basic authentication. The production build resolves a disabled module, so the
-  route code does not enter its function bundle.
 - **`AGENT_URL`** is the agent's deployment, server-side only, and **must include the
   scheme** — validated at boot, or it throws when a task is queued instead.
 - **`AUTH_COOKIE_PREFIX` is `crm`** (`@crm/auth/cookies`), set on **both**
