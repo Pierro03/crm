@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.17.0](https://github.com/trycompai/crm/compare/v1.16.0...v1.17.0) (2026-10-28)
+
+
+### Features
+
+* **app:** adopt Neo design system and EvilCharts ([#262](https://github.com/trycompai/crm/issues/262)) ([ee56599](https://github.com/trycompai/crm/commit/ee56599a09f2425e82e185da8d49bf1d8ab7386d))
+* csv company import ([#253](https://github.com/trycompai/crm/issues/253)) ([81afb5f](https://github.com/trycompai/crm/commit/81afb5fe7f6ef8c43a1d0c70284e14bdae88b395))
+* rebuild tasks page ([#257](https://github.com/trycompai/crm/issues/257)) ([711c909](https://github.com/trycompai/crm/commit/711c909cf016e738c5b2e9418310485ad67bee47))
+
+
+### Fixes
+
+* **api:** add one-click local session login ([#249](https://github.com/trycompai/crm/issues/249)) ([5699b1c](https://github.com/trycompai/crm/commit/5699b1c80baed0d9440fe0563c94fcf4604a4d2a))
+* **app:** inherit build environment variables ([#251](https://github.com/trycompai/crm/issues/251)) ([0f0b928](https://github.com/trycompai/crm/commit/0f0b92842b94a7d8a7a18649621da96f42de480a))
+* **auth:** separate Google chooser hints from access ([#252](https://github.com/trycompai/crm/issues/252)) ([2bd8282](https://github.com/trycompai/crm/commit/2bd82826019d3b534c9454a2a993875404c600c0))
+* preserve durable builder input requests ([#255](https://github.com/trycompai/crm/issues/255)) ([84812f9](https://github.com/trycompai/crm/commit/84812f96e4f4618d337871c051411da8e24d1df8))
+* **ui:** complete token field states ([#256](https://github.com/trycompai/crm/issues/256)) ([50f53bc](https://github.com/trycompai/crm/commit/50f53bcb74b883ac38ef3eeda0362bd0495f4026))
+* update vulnerable dependencies ([#250](https://github.com/trycompai/crm/issues/250)) ([70914bf](https://github.com/trycompai/crm/commit/70914bfe5322a449a3f14bcd0015a3247b7c478a))
+
+
+### Documentation
+
+* bound agent knowledge retrieval ([#254](https://github.com/trycompai/crm/issues/254)) ([9cf3997](https://github.com/trycompai/crm/commit/9cf3997403b77223b1c6b9df81f2031124d3ab20))
+
 ## [1.16.0](https://github.com/trycompai/crm/compare/v1.15.3...v1.16.0) (2026-10-22)
 
 
