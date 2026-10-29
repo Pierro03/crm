@@ -1,8 +1,11 @@
-import { createHash } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import {
+	GetObjectCommand,
+	PutObjectCommand,
+	S3Client,
+} from "@aws-sdk/client-s3";
 import { isMirrored } from "./images";
 import { safeFetch } from "./safe-fetch";
-
-export { isMirrored, isOptimizable } from "./images";
 
 const MAX_BYTES = 3 * 1024 * 1024;
 const TIMEOUT_MS = 15_000;
@@ -20,15 +23,67 @@ const ALLOWED: ExtensionByMediaType = {
 	"image/vnd.microsoft.icon": "ico",
 };
 
+type StorageConfig = {
+	region: string;
+	bucket: string;
+	prefix: string;
+	baseUrl: string;
+	signingSecret: string;
+};
+
+type StoredAsset = {
+	bytes: Uint8Array;
+	contentType: string;
+	cacheControl: string;
+};
+
+let client: S3Client | null = null;
+
+function storageConfig(): StorageConfig | null {
+	const region = process.env.AWS_REGION?.trim();
+	const bucket = process.env.AWS_S3_BUCKET?.trim();
+	const baseUrl = process.env.S3_ASSET_BASE_URL?.trim().replace(/\/$/, "");
+	const signingSecret = process.env.S3_ASSET_SIGNING_SECRET?.trim();
+	if (!region || !bucket || !baseUrl || !signingSecret) return null;
+
+	return {
+		region,
+		bucket,
+		prefix:
+			process.env.AWS_S3_PREFIX?.trim().replace(/^\/+|\/+$/g, "") ||
+			"crm/assets",
+		baseUrl,
+		signingSecret,
+	};
+}
+
+function s3(config: StorageConfig): S3Client {
+	client ??= new S3Client({ region: config.region });
+	return client;
+}
+
+function assetSignature(key: string, secret: string): string {
+	return createHmac("sha256", secret).update(key).digest("base64url");
+}
+
 export function blobEnabled(): boolean {
-	return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+	return storageConfig() !== null;
+}
+
+export function verifyAssetSignature(key: string, signature: string): boolean {
+	const config = storageConfig();
+	if (!config) return false;
+	const expected = Buffer.from(assetSignature(key, config.signingSecret));
+	const actual = Buffer.from(signature);
+	return expected.length === actual.length && timingSafeEqual(expected, actual);
 }
 
 export async function mirror(
 	sourceUrl: string,
 	prefix: string,
 ): Promise<string | null> {
-	if (!blobEnabled()) return null;
+	const config = storageConfig();
+	if (!config) return null;
 	if (isMirrored(sourceUrl)) return sourceUrl;
 
 	try {
@@ -47,20 +102,50 @@ export async function mirror(
 			.update(bytes)
 			.digest("hex")
 			.slice(0, 12);
+		const filename = `${prefix}-${digest}.${extension}`;
+		const key = `${config.prefix}/${filename}`;
 
-		const { put } = await import("@vercel/blob");
+		await s3(config).send(
+			new PutObjectCommand({
+				Bucket: config.bucket,
+				Key: key,
+				Body: bytes,
+				ContentType: type,
+				CacheControl: "public, max-age=31536000, immutable",
+				ServerSideEncryption: "AES256",
+			}),
+		);
 
-		const blob = await put(`${prefix}-${digest}.${extension}`, bytes, {
-			access: "public",
-			contentType: type,
-			addRandomSuffix: false,
-			allowOverwrite: true,
-		});
-
-		return blob.url;
+		const signature = assetSignature(key, config.signingSecret);
+		return `${config.baseUrl}/${encodeURIComponent(filename)}?signature=${signature}`;
 	} catch {
 		return null;
 	}
+}
+
+export async function readStoredAsset(
+	filename: string,
+): Promise<StoredAsset | null> {
+	const config = storageConfig();
+	if (!config || !/^[A-Za-z0-9._-]+$/.test(filename)) return null;
+	const key = `${config.prefix}/${filename}`;
+	const response = await s3(config).send(
+		new GetObjectCommand({ Bucket: config.bucket, Key: key }),
+	);
+	if (!response.Body) return null;
+
+	return {
+		bytes: await response.Body.transformToByteArray(),
+		contentType: response.ContentType ?? "application/octet-stream",
+		cacheControl:
+			response.CacheControl ?? "public, max-age=31536000, immutable",
+	};
+}
+
+export function storedAssetKey(filename: string): string | null {
+	const config = storageConfig();
+	if (!config || !/^[A-Za-z0-9._-]+$/.test(filename)) return null;
+	return `${config.prefix}/${filename}`;
 }
 
 async function readCapped(response: Response): Promise<Buffer | null> {

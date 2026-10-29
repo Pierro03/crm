@@ -150,7 +150,7 @@ export class RollupService {
 
 			cap_perplexity: isSet("PERPLEXITY_API_KEY"),
 			cap_context_dev: Boolean(contextKey?.contextDevApiKey?.trim()),
-			cap_blob: isSet("BLOB_READ_WRITE_TOKEN"),
+			cap_blob: isSet("AWS_S3_BUCKET"),
 			cap_github: isSet("GITHUB_TOKEN"),
 			cap_redis: isSet("REDIS_URL"),
 			cap_agent_bridge: isSet("AGENT_BRIDGE_SECRET"),

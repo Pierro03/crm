@@ -8,6 +8,8 @@ const apiUrl =
 	process.env.NEXT_PUBLIC_API_URL ??
 	"http://localhost:3001";
 
+const assetPattern = new URL("/api/assets/**", apiUrl);
+
 const allowedDevOrigins = (process.env.APP_URL ?? "")
 	.split(",")
 	.flatMap((origin) => {
@@ -32,6 +34,7 @@ const nextConfig: NextConfig = {
 	images: {
 		remotePatterns: [
 			{ protocol: "https", hostname: "**.blob.vercel-storage.com" },
+			assetPattern,
 		],
 	},
 

@@ -1,0 +1,14 @@
+{
+	"Rules": [
+		{
+			"ID": "crm-version-retention",
+			"Status": "Enabled",
+			"Filter": {
+				"Prefix": "crm/"
+			},
+			"AbortIncompleteMultipartUpload": {
+				"DaysAfterInitiation": 7
+			}
+		}
+	]
+}

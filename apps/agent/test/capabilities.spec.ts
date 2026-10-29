@@ -9,7 +9,7 @@ import {
 	unavailable,
 } from "../agent/lib/capabilities";
 
-const KEYS = ["PERPLEXITY_API_KEY", "BLOB_READ_WRITE_TOKEN"] as const;
+const KEYS = ["PERPLEXITY_API_KEY", "AWS_S3_BUCKET"] as const;
 
 const saved: Record<string, string | undefined> = {};
 
@@ -37,7 +37,7 @@ describe("capabilities", () => {
 		process.env.PERPLEXITY_API_KEY = "pplx-test";
 
 		expect(await enabled("PERPLEXITY_API_KEY")).toBe(true);
-		expect(await enabled("BLOB_READ_WRITE_TOKEN")).toBe(false);
+		expect(await enabled("AWS_S3_BUCKET")).toBe(false);
 	});
 
 	it("treats blank and whitespace as unset", async () => {

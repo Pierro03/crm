@@ -1,6 +1,10 @@
 import { db } from "@crm/db";
-import { blobEnabled, isMirrored, mirror } from "@crm/db/blob";
-import { COMPANY_IMAGE_FIELDS, type CompanyImageField } from "@crm/db/images";
+import { blobEnabled, mirror } from "@crm/db/blob";
+import {
+	COMPANY_IMAGE_FIELDS,
+	type CompanyImageField,
+	isMirrored,
+} from "@crm/db/images";
 import { z } from "zod";
 import { brandToUpdate } from "../agent/lib/brand-mapping";
 
@@ -12,7 +16,7 @@ const storedText = z.string().nullable().catch(null);
 
 if (!blobEnabled()) {
 	console.warn(
-		"No BLOB_READ_WRITE_TOKEN — icon tone and dark artwork will still be " +
+		"No S3 storage configuration — icon tone and dark artwork will still be " +
 			"filled in, but nothing will be copied into Blob.",
 	);
 }

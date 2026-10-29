@@ -108,7 +108,24 @@ export class EnvironmentVariables {
 
 	@IsOptional()
 	@IsString()
-	BLOB_READ_WRITE_TOKEN?: string;
+	AWS_REGION?: string;
+
+	@IsOptional()
+	@IsString()
+	AWS_S3_BUCKET?: string;
+
+	@IsOptional()
+	@IsString()
+	AWS_S3_PREFIX?: string;
+
+	@IsOptional()
+	@IsUrl({ require_tld: false, require_protocol: true })
+	S3_ASSET_BASE_URL?: string;
+
+	@IsOptional()
+	@IsString()
+	@MinLength(32)
+	S3_ASSET_SIGNING_SECRET?: string;
 
 	@IsOptional()
 	@IsUrl(

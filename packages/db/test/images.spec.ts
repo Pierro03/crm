@@ -2,10 +2,12 @@ import { describe, expect, it } from "bun:test";
 import { COMPANY_IMAGE_FIELDS, isMirrored, isOptimizable } from "../src/images";
 
 const OURS = "https://abc123.public.blob.vercel-storage.com";
+const S3_ASSET = "https://crm-api.example.com/api/assets/company-ab12.png";
 
 describe("isMirrored", () => {
 	it("recognises our own store, so a re-run does not re-upload", () => {
 		expect(isMirrored(`${OURS}/contacts/c1-9f8e.jpg`)).toBe(true);
+		expect(isMirrored(`${S3_ASSET}?signature=signed`)).toBe(true);
 	});
 
 	it("does not recognise somebody else's CDN", () => {
@@ -38,6 +40,7 @@ describe("isOptimizable", () => {
 				true,
 			);
 		}
+		expect(isOptimizable(`${S3_ASSET}?signature=signed`)).toBe(true);
 	});
 
 	it("refuses an SVG even though it is ours", () => {

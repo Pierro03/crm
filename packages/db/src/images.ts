@@ -14,7 +14,11 @@ const OPTIMIZABLE = new Set(["jpg", "jpeg", "png", "webp", "avif", "gif"]);
 export function isMirrored(url: string | null | undefined): boolean {
 	if (!url) return false;
 	try {
-		return new URL(url).hostname.endsWith(BLOB_HOST_SUFFIX);
+		const parsed = new URL(url);
+		return (
+			parsed.hostname.endsWith(BLOB_HOST_SUFFIX) ||
+			parsed.pathname.startsWith("/api/assets/")
+		);
 	} catch {
 		return false;
 	}

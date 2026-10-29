@@ -20,6 +20,7 @@ import { StatCard } from "@crm/ui/components/stat-card";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";

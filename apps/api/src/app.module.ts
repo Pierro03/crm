@@ -32,6 +32,7 @@ import { SearchModule } from "./search/search.module";
 import { SettingsModule } from "./settings/settings.module";
 import { SlackModule } from "./slack/slack.module";
 import { SsoModule } from "./sso/sso.module";
+import { StorageModule } from "./storage/storage.module";
 import { SyncModule } from "./sync/sync.module";
 import { TelemetryModule } from "./telemetry/telemetry.module";
 import { TrackingModule } from "./tracking/tracking.module";
@@ -81,6 +82,7 @@ import { WorkspaceModule } from "./workspace/workspace.module";
 		TrackingModule,
 		ArchiveModule,
 		SavedViewsModule,
+		StorageModule,
 	],
 })
 export class AppModule {}

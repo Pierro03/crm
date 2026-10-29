@@ -6,6 +6,8 @@ The bucket configuration requires public access blocking, AES-256 server-side en
 
 The `etg-crm-storage` IAM user can list only the `crm/` prefix and manage objects only under that prefix. Its programmatic credentials use the local `etg-crm-s3` AWS profile.
 
-The IAM user has no AWS console password. Rotate its access key through IAM when required.
+The IAM user has no AWS console password. Replace its access key through IAM or migrate the profile to AWS Identity Center.
 
 PostgreSQL remains the source of truth for CRM records and S3 object metadata.
+
+Current and historical object versions remain until an authorized deletion. Incomplete multipart uploads stop after seven days.

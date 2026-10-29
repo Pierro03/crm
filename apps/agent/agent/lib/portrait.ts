@@ -1,5 +1,6 @@
 import { db } from "@crm/db";
-import { blobEnabled, isMirrored, mirror } from "@crm/db/blob";
+import { blobEnabled, mirror } from "@crm/db/blob";
+import { isMirrored } from "@crm/db/images";
 import { CONTEXT_DEV_PEOPLE, enabled } from "./capabilities";
 import { findPortrait, type PortraitSource } from "./portrait-sources";
 
@@ -43,7 +44,7 @@ export async function storePortrait({
 			stored: false,
 			imageUrl: null,
 			reason:
-				"This install has no BLOB_READ_WRITE_TOKEN, so there is nowhere to keep a copy. " +
+				"This install has no S3 storage configuration, so there is nowhere to keep a copy. " +
 				"The source URL expires within weeks and is never stored. Retrying will not help.",
 		};
 	}
@@ -101,7 +102,7 @@ export async function runPortrait({
 			stored: false,
 			imageUrl: null,
 			reason:
-				"This install has no BLOB_READ_WRITE_TOKEN, so there is nowhere to keep a copy. Retrying will not help.",
+				"This install has no S3 storage configuration, so there is nowhere to keep a copy. Retrying will not help.",
 		};
 	}
 
