@@ -5,225 +5,255 @@ import { Button } from "@crm/ui/components/button";
 import {
 	Card,
 	CardAction,
+	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@crm/ui/components/card";
 import {
 	DashboardGrid,
-	DashboardPanel,
 	DashboardSection,
 	StatGroup,
 } from "@crm/ui/components/dashboard";
-import { PageShellLoading } from "@crm/ui/components/page-shell";
 import { StatCard } from "@crm/ui/components/stat-card";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowRightIcon } from "lucide-react";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@crm/ui/components/table";
+import {
+	ArrowRightIcon,
+	DatabaseIcon,
+	FileTextIcon,
+	RadarIcon,
+	ShieldCheckIcon,
+} from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { useTRPC } from "@/lib/trpc/client";
-import type { RouterOutputs } from "@/lib/trpc/types";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
+import { SALES_INTELLIGENCE_SNAPSHOT as snapshot } from "./sales-intelligence-snapshot";
 
-type Summary = RouterOutputs["dashboard"]["summary"];
-type Stage = Summary["pipeline"]["stages"][number]["stage"];
-
-const FLOW: {
-	stage: Stage;
-	label: string;
-	description: string;
-	transfer: string;
-}[] = [
-	{
-		stage: "DEMO_BOOKED",
-		label: "Engaged",
-		description: "A verified contact accepts a commercial conversation.",
-		transfer: "Confirm partner model",
-	},
-	{
-		stage: "QUALIFIED_TO_BUY",
-		label: "Qualified",
-		description: "The account has API demand and a supported ETG fit.",
-		transfer: "Assign sales manager",
-	},
-	{
-		stage: "DECISION_MAKER_BOUGHT_IN",
-		label: "Manager handoff",
-		description: "A sales manager owns the relationship and next action.",
-		transfer: "Shape commercial path",
-	},
-	{
-		stage: "CONTRACT_SENT",
-		label: "Commercial review",
-		description: "Terms, integration, and launch requirements are in review.",
-		transfer: "Close and activate",
-	},
-	{
-		stage: "CLOSED_WON",
-		label: "Partner won",
-		description: "The opportunity converts to an ETG API partnership.",
-		transfer: "Start optimization",
-	},
-];
-
-function stageCount(summary: Summary, stage: Stage) {
-	return (
-		summary.pipeline.stages.find((item) => item.stage === stage)?.count ?? 0
-	);
-}
-
-function percent(value: number, base: number) {
-	if (base === 0) return "0%";
-	return `${Math.round((value / base) * 100)}%`;
-}
+const STATUS_VARIANT = {
+	Live: "default",
+	Integration: "outline",
+	Blocked: "destructive",
+	"Re-engage": "secondary",
+} as const;
 
 export function AcquisitionDashboard() {
-	const trpc = useTRPC();
 	const workspaceUrl = useWorkspaceUrl();
-	const summaryQuery = useQuery({
-		...trpc.dashboard.summary.queryOptions({ scope: "everyone" }),
-		placeholderData: (previous) => previous,
-	});
-
-	const summary = summaryQuery.data;
-	if (!summary) return <PageShellLoading shape="dashboard" />;
-
-	const engaged = stageCount(summary, "DEMO_BOOKED");
-	const qualified = stageCount(summary, "QUALIFIED_TO_BUY");
-	const handoffs = stageCount(summary, "DECISION_MAKER_BOUGHT_IN");
-	const won = summary.wonThisMonth.count;
-	const outreach = summary.recentActivity.filter(
-		(activity) => activity.type === "EMAIL" || activity.type === "CALL",
-	).length;
-
 	return (
 		<div className="flex flex-col gap-6">
+			<section className="relative overflow-hidden rounded-md bg-card p-6 shadow-border">
+				<div className="absolute inset-y-0 right-0 hidden w-2/5 bg-brand/5 @3xl/page-content:block" />
+				<div className="relative flex max-w-3xl flex-col gap-4">
+					<div className="flex items-center gap-2 font-medium text-brand text-xs uppercase tracking-widest">
+						<RadarIcon aria-hidden className="size-4" />
+						ETG sales intelligence
+					</div>
+					<h2 className="font-heading font-semibold text-3xl tracking-tight text-balance">
+						From market signal to API partner action.
+					</h2>
+					<p className="max-w-2xl text-muted-foreground text-sm">
+						This control tower combines the current research, account summaries,
+						and pre-call reports in SalesIntelligence.
+					</p>
+					<div className="flex flex-wrap items-center gap-3 text-13 text-muted-foreground">
+						<span>Snapshot {snapshot.updatedAt}</span>
+						<Badge variant="secondary">Approval required for outreach</Badge>
+					</div>
+				</div>
+			</section>
+
 			<StatGroup>
 				<StatCard
-					label="Active acquisition"
-					value={summary.pipeline.totalDeals}
-					description="Open API partner opportunities"
+					label="Travel targets"
+					value={snapshot.sources.discoveryTargets}
+					description="Researched platform records"
 				/>
 				<StatCard
-					label="Outreach activity"
-					value={outreach}
-					description="Recent calls and email touches"
+					label="Managed accounts"
+					value={snapshot.sources.managedAccounts}
+					description="Across both active cohorts"
 				/>
 				<StatCard
-					label="Qualified for handoff"
-					value={qualified}
-					delta={{ value: percent(qualified, engaged), label: "of engaged" }}
+					label="Action queue"
+					value={14}
+					description="Blocked or stale accounts"
 				/>
 				<StatCard
-					label="Won this month"
-					value={won}
-					description={`${percent(won, qualified)} of qualified opportunities`}
+					label="Pre-call reports"
+					value={snapshot.sources.preCallReports}
+					description="Stored in private S3"
 				/>
 			</StatGroup>
 
 			<DashboardSection
-				title="Conversion board"
-				description="Every account moves through an evidence-backed transfer."
-				action={
-					<Button asChild variant="outline" size="sm">
-						<Link href={workspaceUrl("/deals")}>Open all opportunities</Link>
-					</Button>
-				}
+				title="Acquisition route"
+				description="A shared view from discovery through manager handoff."
 			>
-				<div className="grid grid-cols-1 overflow-hidden rounded-md bg-card shadow-border @4xl/page-content:grid-cols-5">
-					{FLOW.map((item, index) => {
-						const count = stageCount(summary, item.stage);
-						return (
-							<Link
-								key={item.stage}
-								href={`${workspaceUrl("/deals")}?stage=${item.stage}`}
-								className="group flex min-h-48 flex-col justify-between gap-6 border-b p-5 outline-none last:border-b-0 focus-visible:shadow-focus @4xl/page-content:border-r @4xl/page-content:border-b-0 @4xl/page-content:last:border-r-0"
-							>
-								<span className="flex items-center justify-between gap-3">
-									<Badge variant={index === 2 ? "default" : "secondary"}>
-										{item.label}
-									</Badge>
-									{index < FLOW.length - 1 ? (
-										<ArrowRightIcon
-											aria-hidden
-											className="text-muted-foreground"
-										/>
-									) : null}
-								</span>
-								<span className="flex flex-col gap-2">
-									<strong className="font-semibold text-3xl tabular-nums">
-										{count}
-									</strong>
-									<span className="text-muted-foreground text-sm">
-										{item.description}
-									</span>
-								</span>
-								<span className="font-medium text-xs group-hover:underline">
-									Next: {item.transfer}
-								</span>
-							</Link>
-						);
-					})}
+				<div className="grid overflow-hidden rounded-md bg-card shadow-border @3xl/page-content:grid-cols-5">
+					{snapshot.flow.map((step, index) => (
+						<div
+							key={step.label}
+							className="flex min-h-40 flex-col justify-between gap-5 border-b p-5 last:border-b-0 @3xl/page-content:border-r @3xl/page-content:border-b-0 @3xl/page-content:last:border-r-0"
+						>
+							<div className="flex items-center justify-between gap-3">
+								<span className="font-medium text-13">{step.label}</span>
+								{index < snapshot.flow.length - 1 ? (
+									<ArrowRightIcon aria-hidden className="size-4 text-brand" />
+								) : null}
+							</div>
+							<strong className="font-heading text-4xl tabular-nums">
+								{step.value}
+							</strong>
+							<span className="text-muted-foreground text-xs">
+								{step.detail}
+							</span>
+						</div>
+					))}
 				</div>
 			</DashboardSection>
 
 			<DashboardGrid columns={3}>
-				<OperatingCard
-					title="Discovery agent"
-					description="Finds travel companies, gathers evidence, and schedules rechecks."
-					status="Evidence only"
-					action={<Link href={workspaceUrl("/chat")}>Open agent</Link>}
+				{snapshot.regions.map((region) => (
+					<Card key={region.name}>
+						<CardHeader>
+							<CardTitle>{region.name}</CardTitle>
+							<CardDescription>{region.signal}</CardDescription>
+							<CardAction>
+								<Badge variant="secondary">{region.accounts} accounts</Badge>
+							</CardAction>
+						</CardHeader>
+						<CardContent>
+							<span className="text-13 text-muted-foreground">
+								Current regional account summary
+							</span>
+						</CardContent>
+					</Card>
+				))}
+			</DashboardGrid>
+
+			<DashboardSection
+				title="Priority account queue"
+				description="Accounts with a specific next action from the latest summaries."
+				action={
+					<Button asChild variant="outline" size="sm">
+						<Link href={workspaceUrl("/companies")}>Open companies</Link>
+					</Button>
+				}
+			>
+				<div className="overflow-hidden rounded-md bg-card shadow-border">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Account</TableHead>
+								<TableHead>Region</TableHead>
+								<TableHead>Status</TableHead>
+								<TableHead>Next action</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{snapshot.priorityAccounts.map((account) => (
+								<TableRow key={account.name}>
+									<TableCell className="font-medium">{account.name}</TableCell>
+									<TableCell className="text-muted-foreground">
+										{account.region}
+									</TableCell>
+									<TableCell>
+										<Badge variant={STATUS_VARIANT[account.status]}>
+											{account.status}
+										</Badge>
+									</TableCell>
+									<TableCell>{account.nextAction}</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</div>
+			</DashboardSection>
+
+			<DashboardGrid columns={3}>
+				<SourceCard
+					icon={DatabaseIcon}
+					title="Research dataset"
+					detail="199 travel platforms with market, type, evidence, and confidence."
 				/>
-				<OperatingCard
+				<SourceCard
+					icon={FileTextIcon}
+					title="Pre-call intelligence"
+					detail="Marriott and Luxury Escapes reports remain private in S3."
+				/>
+				<SourceCard
+					icon={ShieldCheckIcon}
 					title="Outreach control"
-					description="Drafts relevant messages and keeps external sends behind approval."
-					status={`${outreach} recent touches`}
-					action={<Link href={workspaceUrl("/tasks")}>Review work</Link>}
-				/>
-				<OperatingCard
-					title="Manager handoff"
-					description="Packages fit, sources, risks, contacts, and the next action."
-					status={`${handoffs} active handoffs`}
-					action={
-						<Link
-							href={`${workspaceUrl("/deals")}?stage=DECISION_MAKER_BOUGHT_IN`}
-						>
-							Open handoffs
-						</Link>
-					}
+					detail="The CRM prepares action queues. External messages still require approval."
 				/>
 			</DashboardGrid>
+
+			<DashboardSection
+				title="Discovery shortlist"
+				description="The first researched API ecosystem targets."
+			>
+				<div className="overflow-hidden rounded-md bg-card shadow-border">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Company</TableHead>
+								<TableHead>Platform type</TableHead>
+								<TableHead>Market</TableHead>
+								<TableHead>Confidence</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{snapshot.discoveryTargets.map((target) => (
+								<TableRow key={target.name}>
+									<TableCell className="font-medium">{target.name}</TableCell>
+									<TableCell>{target.type}</TableCell>
+									<TableCell className="text-muted-foreground">
+										{target.market}
+									</TableCell>
+									<TableCell>
+										<Badge
+											variant={
+												target.confidence === "High" ? "default" : "secondary"
+											}
+										>
+											{target.confidence}
+										</Badge>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</div>
+			</DashboardSection>
 		</div>
 	);
 }
 
-function OperatingCard({
+function SourceCard({
+	icon: Icon,
 	title,
-	description,
-	status,
-	action,
+	detail,
 }: {
+	icon: typeof DatabaseIcon;
 	title: string;
-	description: string;
-	status: string;
-	action: ReactNode;
+	detail: string;
 }) {
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>{title}</CardTitle>
-				<CardDescription>{description}</CardDescription>
 				<CardAction>
-					<Badge variant="secondary">{status}</Badge>
+					<Icon aria-hidden className="size-4 text-brand" />
 				</CardAction>
 			</CardHeader>
-			<DashboardPanel>
-				<div className="p-5">
-					<Button asChild variant="outline" size="sm">
-						{action}
-					</Button>
-				</div>
-			</DashboardPanel>
+			<CardContent>
+				<p className="text-muted-foreground text-sm">{detail}</p>
+			</CardContent>
 		</Card>
 	);
 }

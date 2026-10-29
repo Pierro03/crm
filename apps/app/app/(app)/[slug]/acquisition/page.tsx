@@ -3,15 +3,13 @@ import {
 	PageShellContent,
 	PageShellHeader,
 	PageShellHeading,
-	PageShellLoading,
 } from "@crm/ui/components/page-shell";
-import { Suspense } from "react";
 import { requireSession } from "@/lib/session";
-import { HydrateClient } from "@/lib/trpc/hydrate";
-import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { AcquisitionDashboard } from "./acquisition-dashboard";
 
-export default function AcquisitionPage() {
+export default async function AcquisitionPage() {
+	await requireSession();
+
 	return (
 		<PageShell>
 			<PageShellHeader>
@@ -22,24 +20,8 @@ export default function AcquisitionPage() {
 				</PageShellHeading>
 			</PageShellHeader>
 			<PageShellContent>
-				<Suspense fallback={<PageShellLoading shape="dashboard" />}>
-					<AcquisitionSummary />
-				</Suspense>
+				<AcquisitionDashboard />
 			</PageShellContent>
 		</PageShell>
-	);
-}
-
-async function AcquisitionSummary() {
-	await requireSession();
-	const queryClient = getServerQueryClient();
-	await queryClient.prefetchQuery(
-		getServerTrpc().dashboard.summary.queryOptions({ scope: "everyone" }),
-	);
-
-	return (
-		<HydrateClient>
-			<AcquisitionDashboard />
-		</HydrateClient>
 	);
 }
