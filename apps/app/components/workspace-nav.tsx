@@ -14,6 +14,7 @@ import { WorkspaceSwitcher } from "@crm/ui/components/workspace-switcher";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Building2Icon,
+	ChartNoAxesCombinedIcon,
 	HandshakeIcon,
 	LayoutDashboardIcon,
 	ListChecksIcon,
@@ -51,6 +52,12 @@ type WorkspaceData = {
 
 const PRIMARY: NavItem[] = [
 	{ title: "Overview", href: "/", icon: LayoutDashboardIcon, match: "exact" },
+	{
+		title: "Acquisition",
+		href: "/acquisition",
+		icon: ChartNoAxesCombinedIcon,
+		match: "prefix",
+	},
 	{
 		title: "Chat",
 		href: "/chat",

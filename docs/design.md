@@ -18,12 +18,12 @@ here is silent.
 
 ## Colour
 
-Neutral greys, alpha edges, and one emerald accent.
+Neutral greys, alpha edges, and the ETG vivid violet accent.
 
 - `primary` is monochrome: near-black in light, near-white in dark. It is the
   one filled action. `destructive-solid` fills the one action you cannot undo.
   Everything else is outline, ghost or secondary.
-- `brand` (emerald) is the accent, never a fill for buttons: focus ring, caret,
+- `brand` (ETG violet) is the accent, never a fill for buttons: focus ring, caret,
   selection, switches, progress, success.
 - Edges are translucent (`border`, `input`) so they read on any surface. A
   surface draws its edge with `shadow-border`, a menu with `shadow-menu`, a
