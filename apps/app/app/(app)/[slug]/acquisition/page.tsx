@@ -6,9 +6,11 @@ import {
 } from "@crm/ui/components/page-shell";
 import { requireSession } from "@/lib/session";
 import { AcquisitionDashboard } from "./acquisition-dashboard";
+import { loadSalesIntelligenceData } from "./sales-intelligence-data";
 
 export default async function AcquisitionPage() {
 	await requireSession();
+	const intelligence = await loadSalesIntelligenceData();
 
 	return (
 		<PageShell>
@@ -20,7 +22,11 @@ export default async function AcquisitionPage() {
 				</PageShellHeading>
 			</PageShellHeader>
 			<PageShellContent>
-				<AcquisitionDashboard companiesHref="../companies" />
+				<AcquisitionDashboard
+					companiesHref="../companies"
+					initialAccounts={intelligence.accounts}
+					sourceTotals={intelligence.sourceTotals}
+				/>
 			</PageShellContent>
 		</PageShell>
 	);

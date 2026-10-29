@@ -21,6 +21,7 @@
 		"db:push": "turbo run db:push",
 		"db:reset": "turbo run db:reset",
 		"db:seed": "turbo run db:seed",
+		"db:import-sales-intelligence": "bun run --filter=@crm/db db:import-sales-intelligence",
 		"db:studio": "turbo run db:studio",
 		"db:test": "bun --env-file=.env run --filter=@crm/db db:test"
 	},
