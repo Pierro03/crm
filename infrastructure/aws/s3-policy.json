@@ -29,6 +29,16 @@
 				"s3:DeleteObjectVersion"
 			],
 			"Resource": "arn:aws:s3:::etg-sales-intelligence-crm-588957334205/crm/*"
+		},
+		{
+			"Sid": "RotateOwnAccessKey",
+			"Effect": "Allow",
+			"Action": [
+				"iam:CreateAccessKey",
+				"iam:DeleteAccessKey",
+				"iam:ListAccessKeys"
+			],
+			"Resource": "arn:aws:iam::588957334205:user/etg-crm-storage"
 		}
 	]
 }
