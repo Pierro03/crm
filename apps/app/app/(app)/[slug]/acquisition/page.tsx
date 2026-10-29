@@ -20,7 +20,7 @@ export default async function AcquisitionPage() {
 				</PageShellHeading>
 			</PageShellHeader>
 			<PageShellContent>
-				<AcquisitionDashboard />
+				<AcquisitionDashboard companiesHref="../companies" />
 			</PageShellContent>
 		</PageShell>
 	);

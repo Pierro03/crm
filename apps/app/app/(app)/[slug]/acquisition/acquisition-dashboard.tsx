@@ -32,7 +32,6 @@ import {
 	ShieldCheckIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 import { SALES_INTELLIGENCE_SNAPSHOT as snapshot } from "./sales-intelligence-snapshot";
 
 const STATUS_VARIANT = {
@@ -42,8 +41,11 @@ const STATUS_VARIANT = {
 	"Re-engage": "secondary",
 } as const;
 
-export function AcquisitionDashboard() {
-	const workspaceUrl = useWorkspaceUrl();
+export function AcquisitionDashboard({
+	companiesHref,
+}: {
+	companiesHref?: string;
+}) {
 	return (
 		<div className="flex flex-col gap-6">
 			<section className="relative overflow-hidden rounded-md bg-card p-6 shadow-border">
@@ -140,9 +142,11 @@ export function AcquisitionDashboard() {
 				title="Priority account queue"
 				description="Accounts with a specific next action from the latest summaries."
 				action={
-					<Button asChild variant="outline" size="sm">
-						<Link href={workspaceUrl("/companies")}>Open companies</Link>
-					</Button>
+					companiesHref ? (
+						<Button asChild variant="outline" size="sm">
+							<Link href={companiesHref}>Open companies</Link>
+						</Button>
+					) : undefined
 				}
 			>
 				<div className="overflow-hidden rounded-md bg-card shadow-border">

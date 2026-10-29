@@ -14,6 +14,8 @@ const LANDING_PATH = "/";
 
 const SIGN_IN_PATH = "/sign-in";
 
+const LOCAL_PREVIEW_PATH = "/sales-intelligence-preview";
+
 const UNGATED = ["/grant-access", "/eve"];
 
 const ANONYMOUS = ["/t"];
@@ -24,6 +26,13 @@ export async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	if (pathname === SIGN_IN_PATH) return NextResponse.next();
+
+	if (
+		pathname === LOCAL_PREVIEW_PATH &&
+		process.env.NODE_ENV !== "production"
+	) {
+		return NextResponse.next();
+	}
 
 	if (isAnonymous(pathname)) return NextResponse.next();
 
